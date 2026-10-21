@@ -54,7 +54,8 @@ def test_is_empty_rich_text(value, expected):
         ('<ol start="3"><li>Third</li><li>Fourth</li></ol>', '3. Third\n4. Fourth'),
         ('<ul>\n  <li>First</li>\n  <li>Second</li>\n</ul>', '- First\n- Second'),
         ('<table><tr><td>Agenda</td><td>10:00</td></tr><tr><td>Talk</td></tr></table>', 'Agenda 10:00\nTalk'),
-        ('<pre>line one\n  line two</pre>', 'line one\nline two'),
+        ('<pre>if ready:\n    run()</pre>', 'if ready:\n    run()'),
+        ('<p>Intro</p><pre>a\n  b</pre><p>Outro</p>', 'Intro\n\na\n  b\n\nOutro'),
     ),
 )
 def test_rich_text_to_plain_text(value, expected):

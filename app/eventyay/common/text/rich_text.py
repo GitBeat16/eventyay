@@ -21,6 +21,9 @@ _LIST_LINE_RE = re.compile(r'\s*(?:- |\d+\. )')
 _LIST_MARKER_SPACING_RE = re.compile(r'^(\s*(?:- |\d+\. ))\s+')
 _WHITESPACE_RE = re.compile(r'\s+')
 _EXTRA_BLANK_LINES_RE = re.compile(r'\n{3,}')
+# Private-use characters that mark preformatted text, whose indentation must be kept.
+PRE_START = '\ue000'
+PRE_END = '\ue001'
 BLOCK_TAGS = {'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'table'}
 LIST_TAGS = {'ul', 'ol'}
 
@@ -66,10 +69,12 @@ class PlainTextHTMLParser(HTMLParser):
             self.link_start = len(self.parts)
         elif tag == 'pre':
             self.pre_depth += 1
+            self.parts.append(PRE_START)
 
     def handle_endtag(self, tag):
         if tag == 'pre' and self.pre_depth:
             self.pre_depth -= 1
+            self.parts.append(PRE_END)
         if tag in BLOCK_TAGS and not self.lists:
             self.parts.append('\n\n')
         elif tag == 'tr':
@@ -108,8 +113,14 @@ def rich_text_to_plain_text(value) -> str:
     parser.close()
     text = ''.join(parser.parts).replace('\xa0', ' ')
     lines = []
-    for line in text.splitlines():
-        if _LIST_LINE_RE.match(line):
+    in_pre = False
+    for raw_line in text.splitlines():
+        keep_indent = in_pre or PRE_START in raw_line
+        in_pre = keep_indent and PRE_END not in raw_line
+        line = raw_line.replace(PRE_START, '').replace(PRE_END, '')
+        if keep_indent:
+            lines.append(line.rstrip())
+        elif _LIST_LINE_RE.match(line):
             lines.append(_LIST_MARKER_SPACING_RE.sub(r'\1', line.rstrip()))
         else:
             lines.append(line.strip())

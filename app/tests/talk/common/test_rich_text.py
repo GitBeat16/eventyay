@@ -56,6 +56,14 @@ def test_is_empty_rich_text(value, expected):
         ('<table><tr><td>Agenda</td><td>10:00</td></tr><tr><td>Talk</td></tr></table>', 'Agenda 10:00\nTalk'),
         ('<pre>if ready:\n    run()</pre>', 'if ready:\n    run()'),
         ('<p>Intro</p><pre>a\n  b</pre><p>Outro</p>', 'Intro\n\na\n  b\n\nOutro'),
+        ('<p>Hi</p><script>alert("x")</script><style>p { color: red; }</style>', 'Hi'),
+        ('<ol start="--3"><li>First</li></ol>', '1. First'),
+        ('<ol start="\u00b2"><li>First</li></ol>', '1. First'),
+        ('<ol start=""><li>First</li></ol>', '1. First'),
+        ('If a < b\nthen c', 'If a < b\nthen c'),
+        ('x <b and y', 'x <b and y'),
+        ('Some text<h2>Heading</h2><p>Body</p>', 'Some text\n\nHeading\n\nBody'),
+        ('<p>Line one<br/>Line two</p>', 'Line one\nLine two'),
     ),
 )
 def test_rich_text_to_plain_text(value, expected):

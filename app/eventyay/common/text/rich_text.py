@@ -14,7 +14,7 @@ _INVISIBLE_CHARS_RE = re.compile(
 )
 # Tags produced by the rich-text editor. Text without any of them is treated as plain text.
 _RICH_TEXT_TAG_RE = re.compile(
-    r'<\s*/?\s*(?:p|br|div|h[1-6]|ul|ol|li|blockquote|pre|code|strong|b|em|i|u|s|a|span|table|thead|tbody|tr|td|th)\b',
+    r'</?(?:p|br|div|h[1-6]|ul|ol|li|blockquote|pre|code|strong|b|em|i|u|s|a|span|table|thead|tbody|tr|td|th)(?:\s[^<>]*)?/?>',
     re.IGNORECASE,
 )
 _LIST_LINE_RE = re.compile(r'\s*(?:- |\d+\. )')
@@ -26,6 +26,7 @@ PRE_START = '\ue000'
 PRE_END = '\ue001'
 BLOCK_TAGS = {'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'table'}
 LIST_TAGS = {'ul', 'ol'}
+SKIPPED_TAGS = {'script', 'style'}
 
 
 def is_empty_rich_text(value) -> bool:
@@ -47,15 +48,23 @@ class PlainTextHTMLParser(HTMLParser):
         self.link_href = None
         self.link_start = 0
         self.pre_depth = 0
+        self.skip_depth = 0
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'br':
+        if tag in BLOCK_TAGS and not self.lists:
+            self.parts.append('\n\n')
+        if tag in SKIPPED_TAGS:
+            self.skip_depth += 1
+        elif tag == 'br':
             self.parts.append('\n')
         elif tag in LIST_TAGS:
             if not self.lists:
                 self.parts.append('\n\n')
             start = dict(attrs).get('start') if tag == 'ol' else None
-            count = int(start) - 1 if start and start.lstrip('-').isdigit() else 0
+            try:
+                count = int(start) - 1
+            except (TypeError, ValueError):
+                count = 0
             self.lists.append({'ordered': tag == 'ol', 'count': count})
         elif tag == 'li':
             if not self.lists:
@@ -72,6 +81,10 @@ class PlainTextHTMLParser(HTMLParser):
             self.parts.append(PRE_START)
 
     def handle_endtag(self, tag):
+        if tag in SKIPPED_TAGS:
+            if self.skip_depth:
+                self.skip_depth -= 1
+            return
         if tag == 'pre' and self.pre_depth:
             self.pre_depth -= 1
             self.parts.append(PRE_END)
@@ -92,6 +105,8 @@ class PlainTextHTMLParser(HTMLParser):
             self.link_href = None
 
     def handle_data(self, data):
+        if self.skip_depth:
+            return
         if not self.pre_depth:
             data = _WHITESPACE_RE.sub(' ', data)
         self.parts.append(data)

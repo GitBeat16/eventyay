@@ -62,6 +62,7 @@ def test_is_empty_rich_text(value, expected):
         ('<ol start=""><li>First</li></ol>', '1. First'),
         ('If a < b\nthen c', 'If a < b\nthen c'),
         ('x <b and y', 'x <b and y'),
+        ('Intro text\n\nUse <a> tags carefully', 'Intro text\n\nUse <a> tags carefully'),
         ('Some text<h2>Heading</h2><p>Body</p>', 'Some text\n\nHeading\n\nBody'),
         ('<p>Line one<br/>Line two</p>', 'Line one\nLine two'),
     ),

@@ -12,9 +12,10 @@ from django.utils.html import strip_tags
 _INVISIBLE_CHARS_RE = re.compile(
     '[\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff\u00ad]'
 )
-# Tags produced by the rich-text editor. Text without any of them is treated as plain text.
+# Block tags produced by the rich-text editor, which always wraps content in them.
+# Text without any of them is treated as plain text, even if it mentions inline tags like <a>.
 _RICH_TEXT_TAG_RE = re.compile(
-    r'</?(?:p|br|div|h[1-6]|ul|ol|li|blockquote|pre|code|strong|b|em|i|u|s|a|span|table|thead|tbody|tr|td|th)(?:\s[^<>]*)?/?>',
+    r'</?(?:p|br|div|h[1-6]|ul|ol|li|blockquote|pre|table|thead|tbody|tr|td|th)(?:\s[^<>]*)?/?>',
     re.IGNORECASE,
 )
 _LIST_LINE_RE = re.compile(r'\s*(?:- |\d+\. )')

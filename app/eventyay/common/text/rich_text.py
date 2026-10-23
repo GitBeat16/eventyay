@@ -52,8 +52,14 @@ class PlainTextHTMLParser(HTMLParser):
         self.skip_depth = 0
 
     def handle_starttag(self, tag, attrs):
-        if tag in BLOCK_TAGS and not self.lists:
-            self.parts.append('\n\n')
+        if tag in BLOCK_TAGS:
+            if not self.lists:
+                self.parts.append('\n\n')
+            else:
+                # A list item may hold several blocks; put each one after the first on a new line.
+                item_text = ''.join(self.parts[self.lists[-1]['item_start'] :])
+                if item_text.strip() and not item_text.endswith('\n'):
+                    self.parts.append('\n')
         if tag in SKIPPED_TAGS:
             self.skip_depth += 1
         elif tag == 'br':
@@ -66,14 +72,15 @@ class PlainTextHTMLParser(HTMLParser):
                 count = int(start) - 1
             except (TypeError, ValueError):
                 count = 0
-            self.lists.append({'ordered': tag == 'ol', 'count': count})
+            self.lists.append({'ordered': tag == 'ol', 'count': count, 'item_start': len(self.parts)})
         elif tag == 'li':
             if not self.lists:
-                self.lists.append({'ordered': False, 'count': 0})
+                self.lists.append({'ordered': False, 'count': 0, 'item_start': len(self.parts)})
             current = self.lists[-1]
             current['count'] += 1
             marker = f'{current["count"]}. ' if current['ordered'] else '- '
             self.parts.append('\n' + '  ' * (len(self.lists) - 1) + marker)
+            current['item_start'] = len(self.parts)
         elif tag == 'a':
             self.link_href = dict(attrs).get('href')
             self.link_start = len(self.parts)

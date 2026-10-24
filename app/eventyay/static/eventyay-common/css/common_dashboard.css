@@ -1059,7 +1059,7 @@ body:has(.td-dashboard) #page-content {
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;
-  color: var(--td-muted);
+  color: var(--color-text-muted);
   border-bottom: 1px solid #f3f4f6
 }
 .td-analytics-multi-option {
@@ -1074,7 +1074,7 @@ body:has(.td-dashboard) #page-content {
   border-radius: 3px;
   font-size: 12.5px;
   font-weight: 500;
-  color: var(--td-text);
+  color: var(--color-text);
   cursor: pointer;
   white-space: nowrap;
   transition: background-color .12s ease,color .12s ease;

@@ -87,7 +87,7 @@
     table.events-table > tbody > tr > td::before {
         content: attr(data-label);
         font-weight: 600;
-        color: var(--color-text-muted);
+        color: var(--color-grey-dark);
         text-align: left;
         padding-right: 15px;
         flex-shrink: 0;
@@ -300,7 +300,7 @@
 .alert-compact-list { margin-bottom: 0; margin-top: 5px; padding-left: 20px; }
 .warnings-container { margin-left: 50px; margin-top: 25px; border: 1px solid var(--status-warning-border); border-radius: 8px; background: #fff8e1; padding: 18px; }
 .warning-heading { color: var(--status-warning-dark); font-size: 15px; }
-.warning-list { margin-top: 10px; padding-left: 20px; color: var(--color-text-muted); font-size: 13px; line-height: 1.5; }
+.warning-list { margin-top: 10px; padding-left: 20px; color: var(--color-grey-dark); font-size: 13px; line-height: 1.5; }
 .warning-item { margin-bottom: 5px; }
 .warning-link { color: #007bff; }
 .suggestion-heading { color: var(--color-text-muted); font-size: 15px; }

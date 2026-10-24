@@ -445,7 +445,7 @@ table.order-overview-table > tbody > tr.variation.classified > td:first-child::b
 .order-overview-footnote {
   margin: 0;
   padding: 16px 20px;
-  color: var(--color-text-muted);
+  color: var(--color-grey-dark);
   font-size: 13px;
   background: #f8f9fa;
   border-top: 1px solid #eaedf1;

@@ -15,7 +15,7 @@ from eventyay.helpers.i18n import get_html_locale
 
 User = get_user_model()
 
-_HTML_LANG_EN = "<html lang='en'>"
+_HTML_LANG_EN = '<html lang="en">'
 HTML_LANG = re.compile(r'<html lang=["\']([^"\']+)["\']')
 
 

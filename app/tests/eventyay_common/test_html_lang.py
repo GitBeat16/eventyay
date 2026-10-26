@@ -15,14 +15,17 @@ from eventyay.helpers.i18n import get_html_locale
 
 User = get_user_model()
 
-_HTML_LANG_EN = '<html lang="en">'
 HTML_LANG = re.compile(r'<html lang=["\']([^"\']+)["\']')
 
 
-def _html_lang(response):
-    match = HTML_LANG.search(response.content.decode())
+def _lang_of(html):
+    match = HTML_LANG.search(html)
     assert match, 'the <html> tag has no lang attribute'
     return match.group(1)
+
+
+def _html_lang(response):
+    return _lang_of(response.content.decode())
 
 
 def _login(client, locale):
@@ -38,7 +41,7 @@ def user_client(client, db):
 
 @pytest.mark.parametrize(
     ('language', 'expected'),
-    [('en', 'en'), ('de', 'de'), ('de-formal', 'de')],
+    [('en', 'en'), ('de', 'de'), ('de-formal', 'de'), ('ja-jp', 'ja'), ('fa-ir', 'fa-IR')],
 )
 def test_get_html_locale_uses_public_code(language, expected):
     with translation.override(language):
@@ -93,6 +96,14 @@ def test_rtl_language_sets_lang_and_dir(client):
 
 
 @pytest.mark.django_db
+def test_orga_auth_page_sets_lang_and_dir_for_rtl(client):
+    client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'ar'
+    response = client.get(reverse('orga:auth.reset'))
+    assert response.status_code == 200
+    assert re.search(r"<html lang='ar' dir='rtl'", response.content.decode())
+
+
+@pytest.mark.django_db
 def test_common_dashboard_follows_user_locale(client):
     response = _login(client, 'de').get(reverse('eventyay_common:dashboard'))
     assert response.status_code == 200
@@ -108,8 +119,7 @@ def test_not_found_page_follows_selected_language(client):
 
 
 def test_error_page_without_request_context_falls_back_to_en():
-    html = render_to_string('500.html')
-    assert _HTML_LANG_EN in html
+    assert _lang_of(render_to_string('500.html')) == 'en'
 
 
 def test_server_error_page_follows_active_language(rf):

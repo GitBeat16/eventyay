@@ -3,9 +3,9 @@ from django.conf import settings
 from django.template.defaultfilters import date
 from jinja2 import Environment
 
+from eventyay.helpers.i18n import get_html_locale
 from eventyay.helpers.templatetags.thumb import thumb
 
-from .helpers.i18n import get_html_locale
 from .helpers.jinja import static_url, turnstile_script, turnstile_widget, url_for
 
 

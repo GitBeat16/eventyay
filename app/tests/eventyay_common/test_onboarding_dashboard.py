@@ -185,7 +185,9 @@ def test_talks_dashboard_text_uses_global_colours():
     ``stats.js`` moves the analytics filter menu to ``<body>``, outside
     ``.td-dashboard``, so the menu rules must use the global variables directly.
     """
-    css = Path(finders.find('eventyay-common/css/common_dashboard.css')).read_text()
+    path = finders.find('eventyay-common/css/common_dashboard.css')
+    assert path, 'eventyay-common/css/common_dashboard.css was not found by the static files finders'
+    css = Path(path).read_text(encoding='utf-8')
 
     tokens = _declarations_for(css, '.td-dashboard')
     assert re.search(r'--td-text:\s*var\(--color-text\)', tokens)

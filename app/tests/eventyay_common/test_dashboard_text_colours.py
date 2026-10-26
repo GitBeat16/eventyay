@@ -24,6 +24,8 @@ REPLACED_TEXT_COLOURS = re.compile(
 
 @pytest.mark.parametrize('path', DASHBOARD_STYLESHEETS)
 def test_dashboard_text_colours_come_from_global_variables(path):
-    css = Path(finders.find(path)).read_text()
-    found = sorted({f'#{value.lower()}' for value in REPLACED_TEXT_COLOURS.findall(css)})
-    assert not found, f'{path} hard-codes text colours {found}; use the global --color-* variables'
+    found_path = finders.find(path)
+    assert found_path, f'{path} was not found by the static files finders'
+    css = Path(found_path).read_text(encoding='utf-8')
+    hard_coded = sorted({f'#{value.lower()}' for value in REPLACED_TEXT_COLOURS.findall(css)})
+    assert not hard_coded, f'{path} hard-codes text colours {hard_coded}; use the global --color-* variables'

@@ -9,11 +9,13 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import translation
 
+from eventyay.base.views.errors import server_error
 from eventyay.helpers.i18n import get_html_locale
 
 
 User = get_user_model()
 
+_HTML_LANG_EN = "<html lang='en'>"
 HTML_LANG = re.compile(r'<html lang=["\']([^"\']+)["\']')
 
 
@@ -87,7 +89,7 @@ def test_not_found_page_sets_html_lang(client):
 def test_rtl_language_sets_lang_and_dir(client):
     client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'ar'
     response = client.get(reverse('auth.login'))
-    assert re.search(r'<html lang="ar" dir="rtl"', response.content.decode())
+    assert re.search(r"<html lang='ar' dir='rtl'", response.content.decode())
 
 
 @pytest.mark.django_db
@@ -107,4 +109,11 @@ def test_not_found_page_follows_selected_language(client):
 
 def test_error_page_without_request_context_falls_back_to_en():
     html = render_to_string('500.html')
-    assert '<html lang="en">' in html
+    assert _HTML_LANG_EN in html
+
+
+def test_server_error_page_follows_active_language(rf):
+    with translation.override('de'):
+        response = server_error(rf.get('/'))
+    assert response.status_code == 500
+    assert _html_lang(response) == 'de'

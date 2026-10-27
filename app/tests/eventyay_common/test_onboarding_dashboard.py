@@ -198,6 +198,18 @@ def test_talks_dashboard_text_uses_global_colours():
     menu_option = _declarations_for(css, '.td-analytics-multi-option')
     assert re.search(r'(?<![-\w])color:\s*var\(--color-text\)', menu_option)
 
+    # Card titles and numbers are secondary text, so they use the muted grey (#6280 review).
+    for selector in (
+        '.td-kpi-label',
+        '.td-kpi-value',
+        '.td-action-title',
+        '.td-action-count',
+        '.td-upcoming-small',
+        '.td-upcoming-large',
+    ):
+        declarations = _declarations_for(css, selector)
+        assert re.search(r'(?<![-\w])color:\s*var\(--td-muted\)', declarations), f'{selector} should be muted grey'
+
 
 @pytest.mark.django_db
 def test_orders_empty_state(new_user_client):

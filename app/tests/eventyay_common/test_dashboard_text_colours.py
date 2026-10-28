@@ -1,4 +1,4 @@
-"""Dashboard stylesheets take their text colours from the global stylesheet (#6280)."""
+"""The Talks dashboard stylesheet takes its text colours from the global stylesheet (#6280)."""
 
 import re
 from pathlib import Path
@@ -9,10 +9,6 @@ from django.contrib.staticfiles import finders
 
 DASHBOARD_STYLESHEETS = [
     'eventyay-common/css/common_dashboard.css',
-    'eventyay-common/css/dashboard.css',
-    'eventyay-common/css/meetup_dashboard.css',
-    'pretixcontrol/css/admin-page.css',
-    'pretixcontrol/css/order-overview.css',
 ]
 
 # Hard-coded text colours that duplicate --color-text, --color-text-muted or --color-grey-dark.
